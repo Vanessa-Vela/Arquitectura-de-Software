@@ -1,199 +1,168 @@
 # Scraper de Instagram con Playwright
 
-Script en Python que extrae datos y métricas de un perfil de Instagram usando **Playwright** y autenticación por **cookie de sesión (`sessionid`)**. El resultado se guarda en un archivo **JSON**.
+Script en Python que saca información de un perfil de Instagram y la guarda en un archivo JSON. Se hizo como trabajo de la materia de Arquitectura de Software, usando Playwright y la cookie de sesión (`sessionid`) para entrar a la cuenta.
 
-> **Uso académico.** Instagram prohíbe el scraping automatizado en sus términos de uso. Usa una **cuenta secundaria**, extrae solo datos públicos y no abuses del número de ejecuciones.
+Solo es para fines académicos. Instagram no permite el scraping automatizado en sus términos de uso, así que conviene usar una cuenta secundaria y no ejecutarlo muchas veces seguidas.
 
----
+## Qué datos saca
 
-## Objetivo
+Del perfil:
 
-Automatizar la extracción de información de una cuenta de Instagram sin usar extensiones de navegador ni herramientas de terceros que ya tengan el scraping resuelto.
+- nombre
+- nombre de perfil (usuario)
+- seguidores
+- seguidos
+- total de publicaciones
+- biografía
 
-##  Datos que extrae
+De cada publicación (entre 25 y 50):
 
-**Datos generales del perfil**
+- código y tipo (publicación normal o reel)
+- url de la publicación
+- descripción
+- me gusta
+- comentarios
+- url de la imagen
 
-| Campo | Descripción |
-|---|---|
-| `nombre` | Nombre visible del perfil |
-| `nombre_de_perfil` | Usuario (`@usuario`) |
-| `seguidores` | Número de seguidores |
-| `seguidos` | Número de cuentas que sigue |
-| `total_publicaciones` | Total de publicaciones del perfil |
-| `biografia` | Biografía del perfil |
-
-**Publicaciones (entre 25 y 50)**
-
-| Campo | Descripción |
-|---|---|
-| `codigo` | Identificador único de la publicación |
-| `tipo` | `p` (publicación) o `reel` |
-| `url` | Enlace directo |
-| `descripcion` | Texto alternativo de la imagen |
-| `imagen_url` | URL de la imagen |
-
----
+La `url` abre la publicación en Instagram y `imagen_url` es el enlace al archivo de la imagen. Ese enlace caduca con el tiempo, por eso a veces deja de abrir.
 
 ## Requisitos
 
-- Python **3.8 o superior**
-- Librería **Playwright** (permitida por el enunciado)
-- Una cuenta de Instagram (recomendado: secundaria) para obtener la cookie `sessionid`
+- Python 3.8 o superior
+- playwright
+- python-dotenv
+- Una cuenta de Instagram para sacar la cookie
 
-##  Instalación
+## Instalación
 
 ```bash
-# 1. (Opcional) crear entorno virtual
 python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # Linux / macOS
-
-# 2. Instalar Playwright y el navegador
-pip install playwright
+.venv\Scripts\activate
+pip install -r requirements.txt
 playwright install chromium
 ```
 
-##  Cómo obtener tu `sessionid`
+El `requirements.txt` tiene solo dos líneas:
 
-1. Inicia sesión en [instagram.com](https://www.instagram.com) desde Chrome.
-2. Pulsa **F12** → pestaña **Application** (Aplicación).
-3. En el menú izquierdo: **Cookies** → `https://www.instagram.com`.
-4. Busca la fila **`sessionid`** y copia su **Value**.
-
->  La cookie equivale a tu contraseña.
- Si se expone, cierra esa sesión desde *Configuración → Cuentas → Dónde iniciaste sesión*.
-
-##  Configuración
-
-Edita estas variables al inicio de `scraper_ig.py`:
-
-```python
-USUARIO = "usuario_a_scrapear"          # Perfil a scrapear (sin @)
-SESSION_ID = "PEGA_AQUI_TU_SESSIONID"   # Cookie sessionid
-CANTIDAD_POSTS = 50                     # Entre 25 y 50
-ARCHIVO_SALIDA = "resultados.json"      # Archivo de salida
+```
+playwright
+python-dotenv
 ```
 
-## ▶ Ejecución
+## Cómo conseguir el sessionid
+
+1. Iniciar sesión en instagram.com desde Chrome.
+2. Abrir las herramientas de desarrollador con F12.
+3. Ir a la pestaña Application y luego a Cookies, en `https://www.instagram.com`.
+4. Copiar el valor de la fila `sessionid`.
+
+Esa cookie funciona como una contraseña, así que no hay que compartirla ni subirla a GitHub.
+
+## Configuración
+
+La cookie se guarda en un archivo `.env` que no se sube al repositorio. Para crearlo:
+
+```bash
+copy .env.example .env
+```
+
+Luego se abre `.env` y se pega la cookie:
+
+```
+IG_SESSIONID=aqui_va_la_cookie
+```
+
+El usuario a analizar y la cantidad de publicaciones se cambian directamente en `scraper_ig.py`:
+
+```python
+USUARIO = "nombre_del_perfil"
+CANTIDAD_POSTS = 50
+```
+
+## Uso
 
 ```bash
 python scraper_ig.py
 ```
 
-Se abrirá Chromium, entrará al perfil, hará scroll solo y en la terminal verás:
+Se abre una ventana de Chromium, entra al perfil y va bajando sola. Al final se crea el archivo `resultados.json`. En la terminal se ve algo así:
 
 ```
- Entrando al perfil de @usuario...
-    25 publicaciones encontradas
-    40 publicaciones encontradas
-   ...
-Ralizado. 50 publicaciones guardadas en resultados.json
+ Ingresando al perfil de @usuario...
+Datos del perfil con: Método 1 (capturado)
+  12 publicaciones encontradas
+  24 publicaciones encontradas
+  ...
+Publicaciones con métricas: 50 de 50
+ Realizado. 50 publicaciones guardadas en resultados.json
 ```
 
-##  Ejemplo de salida (`resultados.json`)
+## Ejemplo de resultado
 
 ```json
 {
     "perfil": {
         "nombre": "Nombre Apellido",
         "nombre_de_perfil": "usuario",
-        "seguidores": 1523,
-        "seguidos": 210,
-        "total_publicaciones": 87,
+        "seguidores": 2589,
+        "seguidos": 2441,
+        "total_publicaciones": 349,
         "biografia": "Texto de la biografía"
     },
     "publicaciones": [
         {
             "codigo": "ABC123xyz",
-            "tipo": "p",
-            "url": "https://www.instagram.com/p/ABC123xyz/",
-            "descripcion": "Texto alternativo de la imagen",
+            "tipo": "reel",
+            "url": "https://www.instagram.com/reel/ABC123xyz/",
+            "descripcion": "Texto de la publicación",
+            "me_gusta": 356,
+            "comentarios": 4,
             "imagen_url": "https://..."
         }
     ]
 }
 ```
 
----
+## Cómo funciona
 
-##  Cómo funciona
+El script abre Chromium, le pone la cookie `sessionid` al navegador y entra al perfil. Antes de entrar activa una función que revisa todas las respuestas que Instagram descarga por su cuenta.
+
+Para los datos del perfil se usan dos métodos:
+
+1. **Método 1.** Entre esas respuestas hay unas de `graphql` que traen los datos del perfil. La función `buscar_usuario` recorre el JSON hasta encontrar el bloque que tiene la biografía y los seguidores. Con esto los números salen exactos y como enteros.
+2. **Método 2.** Si lo anterior no funciona, se leen las metaetiquetas de la página (`og:title` y `og:description`) con expresiones regulares. Aquí los números pueden salir abreviados, como `12.3K`.
+
+Primero se llenan los datos con el Método 2 y después, si el Método 1 consiguió algo, esos valores se reemplazan por los exactos.
+
+Para las publicaciones se hace scroll hasta juntar la cantidad pedida, guardando cada una por su código para que no se repitan. Los me gusta y los comentarios no aparecen en la cuadrícula del perfil. En vez de abrir cada publicación (que son muchas peticiones y puede dar error 429), se aprovechan las mismas respuestas `graphql` que Instagram descarga al hacer scroll. La función `buscar_publicaciones` las va guardando y al final `agregar_metricas` completa cada publicación.
+
+Entre acciones se usan pausas y distancias de scroll aleatorias para que no se vea tan seguido, y no se hacen peticiones directas a la API de Instagram.
+
+## Problemas que pueden salir
+
+- **Falta IG_SESSIONID:** no existe el archivo `.env` o está vacío.
+- **Error 429 o aviso de esperar unos minutos:** Instagram limitó las peticiones. Hay que esperar un rato y cambiar de red.
+- **Timeout o redirección al login:** la cookie venció o está mal copiada. Se copia una nueva.
+- **Perfil privado:** solo funciona si la cuenta de la cookie ya lo sigue.
+- **Sale "Método 2 (respaldo)":** no se capturó la respuesta de `graphql`. El script sigue funcionando, pero los números salen como texto.
+- **"Publicaciones con métricas: 0":** Instagram cambió el nombre de los campos y hay que revisar la pestaña Network de las herramientas de desarrollador.
+
+## Limitaciones
+
+- Depende de cómo esté hecha la página de Instagram, y eso cambia sin avisar.
+- No saca cuántas veces se compartió una publicación, porque Instagram no lo muestra públicamente.
+- Si el dueño oculta los me gusta, ese dato queda en `null`.
+- No funciona con perfiles privados que no se siguen.
+
+## Seguridad
+
+La cookie solo debe estar en el `.env`, que está en el `.gitignore`. Lo único que se sube es `.env.example`, que tiene un texto de relleno. El `.gitignore` incluye:
 
 ```
-1. Abre Chromium (visible) con Playwright
-2. Inyecta la cookie sessionid  →  Instagram lo reconoce como sesión iniciada
-3. Activa el interceptor de respuestas ANTES de navegar
-4. Entra al perfil
-5. Extrae los datos del perfil con dos métodos:
-     ├── Método 2 (respaldo): metaetiquetas y cabecera
-     └── Método 1: respuesta interna interceptada (datos exactos)
-6. Hace scroll con pausas aleatorias y junta las publicaciones
-7. Guarda todo en un archivo JSON
+.venv/
+.idea/
+__pycache__/
+.env
+resultado*.json
+debug.png
 ```
-
-### Métodos para obtener los datos del perfil
-
-| Método | Qué hace | Ventaja | Desventaja |
-|---|---|---|---|
-| **Método 1: API interna (interceptación)** | Intercepta la respuesta `web_profile_info` que la propia página ya descarga | Números exactos y biografía completa; no genera peticiones extra | No siempre ocurre |
-| **Método 2: Metaetiquetas (respaldo)** | Lee las metaetiquetas Open Graph y el texto de la cabecera | Casi siempre disponible | Números abreviados (`1.2M`) y biografía aproximada |
-
-El Método 2 llena los datos primero. Si el Método 1 capturó la respuesta, **sustituye** esos valores por los exactos.
-
-### Estructura del código
-
-| Pieza | Función |
-|---|---|
-| Configuración | Perfil, cookie, cantidad de posts y archivo de salida |
-| `interceptar_respuesta_perfil` | Captura la respuesta interna de Instagram (Método 1) |
-| `pausa` | Espera aleatoria de 2 a 4 segundos |
-| `obtener_perfil` | Extrae los datos generales del perfil |
-| `obtener_posts` | Scroll infinito y recolección de publicaciones sin repetir |
-| `main` | Orquesta el flujo y guarda el JSON |
-
-### Medidas para evitar bloqueos
-
-- Navegador real y visible (no *headless*).
-- Pausas y distancias de scroll aleatorias.
-- No se hacen peticiones directas a la API: solo se lee lo que la página ya descarga.
-- Máximo 50 publicaciones por ejecución.
-
----
-
-## Posibles problemas
-
-| Problema | Causa probable | Solución |
-|---|---|---|
-| Error `429` o aviso de "espera unos minutos" | Demasiadas peticiones | Espera 20–30 min, cambia de red y reduce las ejecuciones |
-| Timeout esperando el `header` | Cookie inválida/expirada o perfil no cargó | Copia un `sessionid` nuevo |
-| Instagram redirige al login | `sessionid` incorrecta o vencida | Vuelve a iniciar sesión y copia la cookie |
-| Perfil privado | La cuenta de la cookie no lo sigue | Solo funciona si ya lo sigue |
-| Seguidores con formato `1.2M` | Se usó el Método 2 | Es normal; el Método 1 trae el número exacto |
-| El script dejó de funcionar | Instagram cambió su estructura | Ajustar selectores y patrones |
-
-##  Limitaciones
-
-- Depende de la estructura actual de Instagram, que puede cambiar sin aviso.
-- No extrae likes ni comentarios, porque no aparecen en la cuadrícula del perfil (habría que abrir cada publicación, lo que aumenta el riesgo de bloqueo).
-- No funciona con perfiles privados que la cuenta de la cookie no siga.
-
-##  Mejoras futuras
-
-- Guardar la cookie en un archivo `.env` en vez de dejarla en el código.
-- Exportar también a CSV o Excel.
-- Añadir likes y comentarios abriendo cada publicación con pausas largas.
-- Reintentos automáticos y manejo de errores más detallado.
-
-## Buenas prácticas de seguridad
-
-- Nunca subir  `sessionid` a un repositorio. Si usas Git, agrega a `.gitignore`:
-  ```
-  .env
-  resultados.json
-  ```
-- Usa una cuenta secundaria.
-- Cierra la sesión de la cookie al terminar de probar.
-
-## Licencia y aviso
-
-Proyecto con fines **educativos**. El autor no se responsabiliza del uso indebido ni de las restricciones que Instagram pueda aplicar a la cuenta utilizada.
