@@ -9,8 +9,6 @@ from dotenv import load_dotenv
 USUARIO = "alondra_cgp"                  # Perfil a scrapear
 load_dotenv()                           # lee el archivo .env
 SESSION_ID = os.getenv("IG_SESSIONID")  # la cookie viene del .env, no del código
-if not SESSION_ID:
-    raise SystemExit("Falta IG_SESSIONID en el archivo .env")
 CANTIDAD_POSTS = 50
 ARCHIVO_SALIDA = "resultados.json"
 # -----------------------------------------------
@@ -162,32 +160,55 @@ def obtener_posts(page, cantidad):
     return lista
 
 
-def main():
+def scrapear(usuario=None, cantidad=None, session_id=None):
+    # Hace todo el recorrido (perfil + publicaciones) y devuelve (perfil, posts).
+    # La usan main() y la API del Big Five (backend/scraper.py).
+    global USUARIO, CANTIDAD_POSTS, SESSION_ID
+    USUARIO = usuario or USUARIO
+    CANTIDAD_POSTS = cantidad or CANTIDAD_POSTS
+    SESSION_ID = session_id or SESSION_ID
+    if not SESSION_ID:
+        raise RuntimeError("Falta IG_SESSIONID en el archivo .env")
+
+    datos_api.clear()      # por si se llama más de una vez en el mismo proceso
+    datos_posts.clear()
+
     with sync_playwright() as p:
         navegador = p.chromium.launch(headless=False)
-        contexto = navegador.new_context(locale="en-US", viewport={"width": 1280, "height": 900})
-        contexto.add_cookies([{"name": "sessionid", "value": SESSION_ID,
-                               "domain": ".instagram.com", "path": "/",
-                               "secure": True, "httpOnly": True}])
+        try:
+            contexto = navegador.new_context(locale="en-US", viewport={"width": 1280, "height": 900})
+            contexto.add_cookies([{"name": "sessionid", "value": SESSION_ID,
+                                   "domain": ".instagram.com", "path": "/",
+                                   "secure": True, "httpOnly": True}])
 
-        page = contexto.new_page()
-        page.on("response", escuchar_respuestas)  # Activar la captura de datos ANTES de entrar
+            page = contexto.new_page()
+            page.on("response", escuchar_respuestas)  # Activar la captura de datos ANTES de entrar
 
-        print(f" Ingresando al perfil de @{USUARIO}...")
-        page.goto(f"https://www.instagram.com/{USUARIO}/", wait_until="domcontentloaded")
+            print(f" Ingresando al perfil de @{USUARIO}...")
+            page.goto(f"https://www.instagram.com/{USUARIO}/", wait_until="domcontentloaded")
 
-        perfil = obtener_perfil(page)
-        print("Datos del perfil con:", "Método 1 (capturado)" if datos_api.get("perfil") else "Método 2 (respaldo)")
-        posts = obtener_posts(page, CANTIDAD_POSTS)
+            perfil = obtener_perfil(page)
+            print("Datos del perfil con:", "Método 1 (capturado)" if datos_api.get("perfil") else "Método 2 (respaldo)")
+            posts = obtener_posts(page, CANTIDAD_POSTS)
+        finally:
+            navegador.close()
 
-        con_metricas = sum(1 for p in posts if p["me_gusta"] is not None)
-        print(f"Publicaciones con métricas: {con_metricas} de {len(posts)}")
+    return perfil, posts
 
-        with open(ARCHIVO_SALIDA, "w", encoding="utf-8") as f:
-            json.dump({"perfil": perfil, "publicaciones": posts}, f, ensure_ascii=False, indent=4)
 
-        print(f" Realizado . {len(posts)} publicaciones guardadas en {ARCHIVO_SALIDA}")
-        navegador.close()
+def main():
+    if not SESSION_ID:
+        raise SystemExit("Falta IG_SESSIONID en el archivo .env")
+
+    perfil, posts = scrapear()
+
+    con_metricas = sum(1 for p in posts if p["me_gusta"] is not None)
+    print(f"Publicaciones con métricas: {con_metricas} de {len(posts)}")
+
+    with open(ARCHIVO_SALIDA, "w", encoding="utf-8") as f:
+        json.dump({"perfil": perfil, "publicaciones": posts}, f, ensure_ascii=False, indent=4)
+
+    print(f" Realizado . {len(posts)} publicaciones guardadas en {ARCHIVO_SALIDA}")
 
 
 if __name__ == "__main__":
