@@ -1,0 +1,40 @@
+:root {
+  --fondo: #f4f5f7; --tarjeta: #fff; --texto: #1f2933; --suave: #6b7280;
+  --acento: #3b5bdb; --borde: #e3e6ea;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, "Segoe UI", sans-serif; background: var(--fondo); color: var(--texto); line-height: 1.5; }
+header { text-align: center; padding: 28px 16px 8px; }
+header h1 { margin: 0; font-size: 1.7rem; }
+header p { margin: 4px 0 0; color: var(--suave); }
+main { max-width: 960px; margin: 0 auto; padding: 16px; }
+.card { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+h2 { margin: 0 0 12px; font-size: 1.1rem; }
+h3 { margin: 14px 0 4px; font-size: .95rem; }
+form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+label { display: flex; flex-direction: column; font-size: .85rem; color: var(--suave); gap: 4px; }
+label.check { flex-direction: row; align-items: center; gap: 6px; padding-bottom: 8px; }
+input[type=text], select { padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: 1rem; }
+input[type=text] { min-width: 240px; }
+button { background: var(--acento); color: #fff; border: 0; padding: 9px 20px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+button:disabled { opacity: .6; cursor: wait; }
+.nota { font-size: .8rem; color: var(--suave); margin: 8px 0 0; }
+.nota a { color: var(--acento); cursor: pointer; margin-right: 8px; }
+.mensaje { padding: 12px 14px; border-radius: 8px; background: #eef2ff; border: 1px solid #c7d2fe; }
+.mensaje.error { background: #fef2f2; border-color: #fecaca; }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 720px) { .fila { grid-template-columns: 1fr; } }
+.perfil-cab { display: flex; flex-wrap: wrap; gap: 24px; align-items: baseline; }
+.perfil-cab h2 { margin: 0; }
+.stat b { display: block; font-size: 1.1rem; }
+.stat span { font-size: .8rem; color: var(--suave); }
+.rasgo { margin-bottom: 14px; }
+.rasgo-cab { display: flex; justify-content: space-between; font-size: .92rem; }
+.barra { height: 8px; background: var(--borde); border-radius: 4px; overflow: hidden; margin: 4px 0; }
+.barra i { display: block; height: 100%; background: var(--acento); }
+.rasgo small { color: var(--suave); }
+.tabla-scroll { max-height: 360px; overflow: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+td.desc { max-width: 440px; }
+footer { text-align: center; color: var(--suave); font-size: .8rem; padding: 12px 16px 28px; }

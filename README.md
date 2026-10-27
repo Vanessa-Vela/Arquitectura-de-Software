@@ -1,6 +1,6 @@
 # Scraper de Instagram con Playwright
 
-Script en Python que saca información de un perfil de Instagram y la guarda en un archivo JSON. Se hizo como trabajo de la materia de Arquitectura de Software, usando Playwright y la cookie de sesión (`sessionid`) para entrar a la cuenta.
+Script en Python que saca información de un perfil de Instagram y la guarda en un archivo JSON. Se hizo como trabajo de la materia de Arquitectura de Software, usando Playwright y la cookie de sesión (`sessionid`) para entrar a la cuenta. Sobre este mismo scraper se agregó después un análisis de personalidad Big Five (ver la sección [Análisis Big Five](#análisis-big-five)).
 
 Solo es para fines académicos. Instagram no permite el scraping automatizado en sus términos de uso, así que conviene usar una cuenta secundaria y no ejecutarlo muchas veces seguidas.
 
@@ -31,6 +31,7 @@ La `url` abre la publicación en Instagram y `imagen_url` es el enlace al archiv
 - Python 3.8 o superior
 - playwright
 - python-dotenv
+- fastapi, uvicorn, pydantic y google-genai (solo para el análisis Big Five)
 - Una cuenta de Instagram para sacar la cookie
 
 ## Instalación
@@ -42,12 +43,7 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-El `requirements.txt` tiene solo dos líneas:
-
-```
-playwright
-python-dotenv
-```
+El `requirements.txt` incluye las librerías del scraper (`playwright`, `python-dotenv`) y las del análisis Big Five (`fastapi`, `uvicorn`, `pydantic`, `google-genai`).
 
 ## Cómo conseguir el sessionid
 
@@ -72,7 +68,7 @@ Luego se abre `.env` y se pega la cookie:
 IG_SESSIONID=aqui_va_la_cookie
 ```
 
-El usuario a analizar y la cantidad de publicaciones se cambian directamente en `scraper_ig.py`:
+Para usar el scraper solo por consola, el usuario a analizar y la cantidad de publicaciones se cambian directamente en `scraper_ig.py`:
 
 ```python
 USUARIO = "nombre_del_perfil"
@@ -156,7 +152,7 @@ Entre acciones se usan pausas y distancias de scroll aleatorias para que no se v
 
 ## Seguridad
 
-La cookie solo debe estar en el `.env`, que está en el `.gitignore`. Lo único que se sube es `.env.example`, que tiene un texto de relleno. El `.gitignore` incluye:
+La cookie solo debe estar en el `.env`, que está en el `.gitignore`. Lo único que se sube es `.env.example`, que tiene un texto de relleno. Los JSON con datos de perfiles analizados (`data/*.json`) tampoco se suben. El `.gitignore` incluye:
 
 ```
 .venv/
@@ -165,4 +161,31 @@ __pycache__/
 .env
 resultado*.json
 debug.png
+data/*.json
+!data/.gitkeep
 ```
+
+## Análisis Big Five
+
+Sobre este mismo scraper se armó una pequeña aplicación web que estima los rasgos de personalidad (modelo Big Five / OCEAN) de una cuenta pública, usando la API de Gemini. Si no hay API key, usa un análisis local por reglas. Es una estimación con fines académicos, no un diagnóstico psicológico.
+
+El detalle de la estructura, los endpoints y cómo se calcula está en [docs/BIGFIVE.md](docs/BIGFIVE.md).
+
+### Configuración adicional
+
+En el `.env` se agregan, además de `IG_SESSIONID`:
+
+```
+GEMINI_API_KEY=tu_clave
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+La clave se saca gratis en https://aistudio.google.com/app/apikey. Si se deja vacía, se usa el análisis local.
+
+### Uso
+
+```bash
+python run.py
+```
+
+Se abre en http://127.0.0.1:8000. Se escribe el usuario y se pulsa **Analizar**. Si ya existe `data/<usuario>.json` se analiza sin volver a scrapear; con **Volver a scrapear** se abre Chromium y se sacan los datos de nuevo. `python scraper_ig.py` sigue funcionando por separado y genera `resultados.json`.

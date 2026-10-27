@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Big Five desde Instagram</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Big Five desde Instagram</h1>
+    <p>Estimación de rasgos de personalidad (OCEAN) a partir de una cuenta pública.</p>
+  </header>
+
+  <main>
+    <section class="card" id="formulario">
+      <form id="form-analisis">
+        <label>Usuario de Instagram
+          <input id="usuario" type="text" placeholder="alondra_cgp" required pattern="[A-Za-z0-9._]{1,30}">
+        </label>
+        <label>Publicaciones
+          <select id="posts">
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+        <label class="check"><input id="refrescar" type="checkbox"> Volver a scrapear</label>
+        <button type="submit" id="btn-analizar">Analizar</button>
+      </form>
+      <p id="estado-servicio" class="nota"></p>
+      <p id="guardados" class="nota"></p>
+    </section>
+
+    <p id="mensaje" class="mensaje" hidden></p>
+
+    <section id="resultado" hidden>
+      <div class="card" id="perfil"></div>
+
+      <div class="fila">
+        <div class="card">
+          <h2>Perfil OCEAN</h2>
+          <canvas id="radar"></canvas>
+        </div>
+        <div class="card">
+          <h2>Rasgos</h2>
+          <div id="rasgos"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Resumen</h2>
+        <p id="resumen"></p>
+        <h3>Estilo de comunicación</h3>
+        <p id="estilo"></p>
+        <h3>Fortalezas</h3>
+        <ul id="fortalezas"></ul>
+        <p id="limitaciones" class="nota"></p>
+        <p id="metodo" class="nota"></p>
+      </div>
+
+      <div class="card">
+        <h2>Publicaciones analizadas</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Tipo</th><th>Descripción</th><th>Me gusta</th><th>Comentarios</th></tr></thead>
+            <tbody id="tabla-posts"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Solo datos públicos. Los puntajes son estimaciones con fines académicos, no un diagnóstico psicológico.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
