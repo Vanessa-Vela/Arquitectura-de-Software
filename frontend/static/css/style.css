@@ -38,3 +38,15 @@ table { width: 100%; border-collapse: collapse; font-size: .85rem; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--borde); vertical-align: top; }
 td.desc { max-width: 440px; }
 footer { text-align: center; color: var(--suave); font-size: .8rem; padding: 12px 16px 28px; }
+
+/* ---- pestañas y Benford ---- */
+.tabs { display: flex; justify-content: center; gap: 8px; padding: 8px 16px 0; }
+.tabs button { background: #fff; color: var(--texto); border: 1px solid var(--borde); padding: 8px 18px; }
+.tabs button.activa { background: var(--acento); color: #fff; border-color: var(--acento); }
+.veredicto { padding: 10px 14px; border-radius: 8px; font-weight: 600; margin: 8px 0; }
+.veredicto.ok { background: #ecfdf3; border: 1px solid #a7f3d0; }
+.veredicto.alerta { background: #fef2f2; border: 1px solid #fecaca; }
+.veredicto.neutro { background: #f3f4f6; border: 1px solid var(--borde); }
+.stats { display: flex; flex-wrap: wrap; gap: 24px; margin: 8px 0; }
+.advertencias { margin: 8px 0 0; padding-left: 18px; font-size: .82rem; color: var(--suave); }
+input[type=number] { padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: 1rem; width: 90px; }

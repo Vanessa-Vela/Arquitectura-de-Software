@@ -45,3 +45,45 @@ class Analisis(BaseModel):
     publicaciones: List[Publicacion]
     bigfive: BigFive
     origen: str         # "cache" o "scraping"
+
+
+# ---------- Ley de Benford ----------
+class DigitoBenford(BaseModel):
+    digito: int
+    observado: int
+    observado_pct: float
+    esperado: float
+    esperado_pct: float
+
+
+class FilaBenford(BaseModel):
+    usuario: str
+    valor_texto: Optional[str] = None
+    valor: Optional[int] = None
+    primer_digito: Optional[int] = None
+
+
+class ResultadoBenford(BaseModel):
+    n_total: int
+    n_validos: int
+    n_excluidos: int
+    digitos: List[DigitoBenford]
+    chi2: Optional[float] = None
+    gl: int
+    p_valor: Optional[float] = None
+    valor_critico: float
+    valor_critico_1: float
+    ajusta: Optional[bool] = None       # True = natural, False = desviada, None = muestra insuficiente
+    veredicto: str
+    interpretacion: str
+    advertencias: List[str]
+    tabla: List[FilaBenford]
+
+
+class RespuestaBenford(BaseModel):
+    usuario: str
+    lista: str          # followers | following (popup que se abrió)
+    metrica: str        # followers | following (cifra que se leyó de cada cuenta)
+    origen: str         # "cache" o "scraping"
+    archivo_csv: str
+    resultado: ResultadoBenford

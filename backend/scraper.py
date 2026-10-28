@@ -19,3 +19,11 @@ def scrapear_perfil(usuario, cantidad=config.POSTS_POR_DEFECTO, sessionid=None):
 
     with _candado:
         return scraper_ig.scrapear(usuario, cantidad, sessionid or config.IG_SESSIONID)
+
+
+def scrapear_seguidores(usuario, lista, metrica, muestra, sessionid=None):
+    import scraper_seguidores   # abre el popup de seguidores/seguidos y lee la cifra de cada cuenta
+
+    with _candado:               # comparte el candado: solo un navegador a la vez
+        return scraper_seguidores.scrapear_seguidores(usuario, lista, metrica, muestra,
+                                                      sessionid or config.IG_SESSIONID)

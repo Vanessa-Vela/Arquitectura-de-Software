@@ -6,3 +6,8 @@ debug.png
 .env
 data/*.json
 !data/.gitkeep
+data/benford/*
+!data/benford/.gitkeep
+benford_*.csv
+debug_*.png
+*.iml

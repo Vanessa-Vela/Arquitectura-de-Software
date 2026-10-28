@@ -12,8 +12,14 @@
     <p>Estimación de rasgos de personalidad (OCEAN) a partir de una cuenta pública.</p>
   </header>
 
+  <nav class="tabs">
+    <button type="button" id="tab-bigfive" class="activa">Big Five</button>
+    <button type="button" id="tab-benford">Ley de Benford</button>
+  </nav>
+
   <main>
-    <section class="card" id="formulario">
+    <div id="vista-bigfive">
+      <section class="card" id="formulario">
       <form id="form-analisis">
         <label>Usuario de Instagram
           <input id="usuario" type="text" placeholder="alondra_cgp" required pattern="[A-Za-z0-9._]{1,30}">
@@ -69,15 +75,77 @@
         </div>
       </div>
     </section>
+    </div>
+
+    <div id="vista-benford" hidden>
+      <section class="card">
+        <h2>Ley de Benford en seguidores</h2>
+        <p class="nota">Abre la lista de seguidores o seguidos del perfil, lee la cifra de cada cuenta pasando el cursor por encima
+          y compara la distribución de su primer dígito con la ley de Benford (prueba chi-cuadrado).</p>
+        <form id="form-benford">
+          <label>Usuario de Instagram
+            <input id="b-usuario" type="text" placeholder="alondra_cgp" required pattern="[A-Za-z0-9._]{1,30}">
+          </label>
+          <label>Lista a abrir
+            <select id="b-lista">
+              <option value="followers">Seguidores</option>
+              <option value="following">Seguidos</option>
+            </select>
+          </label>
+          <label>Cifra de cada cuenta
+            <select id="b-metrica">
+              <option value="followers">Sus seguidores</option>
+              <option value="following">Sus seguidos</option>
+            </select>
+          </label>
+          <label>Muestra
+            <input id="b-muestra" type="number" min="30" max="500" value="200">
+          </label>
+          <label class="check"><input id="b-refrescar" type="checkbox"> Volver a scrapear</label>
+          <button type="submit" id="btn-benford">Analizar</button>
+        </form>
+        <p class="nota">Con 200 cuentas tarda varios minutos: se abre Chromium y revisa una cuenta a la vez.</p>
+      </section>
+
+      <p id="mensaje-benford" class="mensaje" hidden></p>
+
+      <section id="resultado-benford" hidden>
+        <div class="card" id="benford-resumen"></div>
+        <div class="card">
+          <h2>Frecuencia del primer dígito</h2>
+          <canvas id="grafico-benford"></canvas>
+        </div>
+        <div class="card">
+          <h2>Conteo por dígito</h2>
+          <div class="tabla-scroll">
+            <table>
+              <thead><tr><th>Dígito</th><th>Observado</th><th>Observado %</th><th>Esperado (Benford)</th><th>Esperado %</th></tr></thead>
+              <tbody id="benford-digitos"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Muestra: usuario y cifra</h2>
+          <p class="nota" id="benford-descarga"></p>
+          <div class="tabla-scroll">
+            <table>
+              <thead><tr><th>Usuario</th><th>Cifra</th><th>Valor</th><th>Primer dígito</th></tr></thead>
+              <tbody id="benford-tabla"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer>
     Solo datos públicos. Los puntajes son estimaciones con fines académicos, no un diagnóstico psicológico.
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/static/js/vendor/chart.umd.js"></script>
   <script src="/static/js/api.js"></script>
   <script src="/static/js/charts.js"></script>
   <script src="/static/js/app.js"></script>
+  <script src="/static/js/benford.js"></script>
 </body>
 </html>
